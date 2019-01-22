@@ -53,8 +53,8 @@ resource "aws_security_group_rule" "tfe-admin" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 }
-resource "aws_security_group_rule" "web-egress" {
-    security_group_id = "${aws_security_group.web.id}"
+resource "aws_security_group_rule" "tfe-egress" {
+    security_group_id = "${aws_security_group.tfe.id}"
     type = "egress"
     from_port = 0
     to_port = 0

@@ -113,7 +113,7 @@ resource "aws_route_table_association" "rtb-tfe" {
 # subnet public
 
 resource "aws_subnet" "dmz_subnet" {
-  vpc_id                  = "${aws_vpc.hashicorp_vpc.id}"
+  vpc_id                  = "${aws_vpc.hc_tfe_vpc.id}"
   cidr_block              = "${cidrsubnet(var.network_address_space, 8, 1)}"
   map_public_ip_on_launch = "true"
   availability_zone       = "${data.aws_availability_zones.available.names[0]}"
