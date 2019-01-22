@@ -7,7 +7,7 @@ resource "aws_instance" "tfe_nodes" {
   subnet_id                   = "${aws_subnet.tfe_subnet.id}"
   private_ip                  = "${cidrhost(aws_subnet.tfe_subnet.cidr_block, count.index + 100)}"
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${aws_security_group.tfe}"]
+  vpc_security_group_ids      = ["${aws_security_group.tfe.id}"]
   key_name                    = "${var.key_name}"
   
   tags = [
