@@ -103,12 +103,6 @@ resource "aws_route_table_association" "dmz-subnet" {
   subnet_id      = "${aws_subnet.dmz_subnet.*.id[0]}"
   route_table_id = "${aws_route_table.rtb.id}"
     
-    tags {
-        Name = "${var.name}-dmz-sn-as"
-        Environment = "${var.environment_tag}"
-        TTL         = "${var.ttl}"
-        Owner       = "${var.owner}"
-    }
 }
 
 # limit the amout of public web subnets to the amount of AZ or less
@@ -117,11 +111,6 @@ resource "aws_route_table_association" "pub_tfe-subnet" {
   subnet_id      = "${element(aws_subnet.pub_tfe_subnet.*.id, count.index)}"
   route_table_id = "${aws_route_table.rtb.id}"
     
-    tags {
-        Name = "${var.name}-pub-tfe-sn-as"
-        Environment = "${var.environment_tag}"
-        TTL         = "${var.ttl}"
-        Owner       = "${var.owner}"
     }
 }
 
@@ -132,13 +121,6 @@ resource "aws_route_table_association" "rtb-tfe" {
     count          = "${var.tfe_subnet_count}"
     subnet_id      = "${element(aws_subnet.tfe_subnet.*.id, count.index)}"
     route_table_id = "${aws_route_table.rtb-nat.id}"
-
-    tags {
-        Name = "${var.name}-tfe-sn-as"
-        Environment = "${var.environment_tag}"
-        TTL         = "${var.ttl}"
-        Owner       = "${var.owner}"
-    }
 
 }
 
