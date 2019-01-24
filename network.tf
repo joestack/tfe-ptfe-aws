@@ -42,6 +42,8 @@ resource "aws_vpc" "hc_tfe_vpc" {
   tags {
           Name        = "${var.name}-vpc"
           Environment = "${var.environment_tag}"
+          TTL         = "${var.ttl}"
+          Owner       = "${var.owner}"
   }
 
 }
@@ -50,6 +52,13 @@ resource "aws_vpc" "hc_tfe_vpc" {
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = "${aws_vpc.hc_tfe_vpc.id}"
+  
+  tags {
+          Name        = "${var.name}-igw"
+          Environment = "${var.environment_tag}"
+          TTL         = "${var.ttl}"
+          Owner       = "${var.owner}"
+  }
 
 }
 
@@ -62,8 +71,10 @@ resource "aws_route_table" "rtb" {
   }
 
     tags {
-        Name        = "${var.name}-igw"
+        Name        = "${var.name}-rtb"
         Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"
     }
 
 }
@@ -79,8 +90,10 @@ resource "aws_route_table" "rtb-nat" {
     }
 
     tags {
-        Name = "${var.name}-nat_instance"
+        Name = "${var.name}-rtb-nat"
         Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"
     }
 }
 
@@ -89,7 +102,13 @@ resource "aws_route_table" "rtb-nat" {
 resource "aws_route_table_association" "dmz-subnet" {
   subnet_id      = "${aws_subnet.dmz_subnet.*.id[0]}"
   route_table_id = "${aws_route_table.rtb.id}"
-
+    
+    tags {
+        Name = "${var.name}-dmz-sn-as"
+        Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"
+    }
 }
 
 # limit the amout of public web subnets to the amount of AZ or less
@@ -97,7 +116,13 @@ resource "aws_route_table_association" "pub_tfe-subnet" {
   count          = "${local.mod_az}"
   subnet_id      = "${element(aws_subnet.pub_tfe_subnet.*.id, count.index)}"
   route_table_id = "${aws_route_table.rtb.id}"
-
+    
+    tags {
+        Name = "${var.name}-pub-tfe-sn-as"
+        Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"
+    }
 }
 
 # private subnet to NAT
@@ -107,6 +132,14 @@ resource "aws_route_table_association" "rtb-tfe" {
     count          = "${var.tfe_subnet_count}"
     subnet_id      = "${element(aws_subnet.tfe_subnet.*.id, count.index)}"
     route_table_id = "${aws_route_table.rtb-nat.id}"
+
+    tags {
+        Name = "${var.name}-tfe-sn-as"
+        Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"
+    }
+
 }
 
 
@@ -118,10 +151,11 @@ resource "aws_subnet" "dmz_subnet" {
   map_public_ip_on_launch = "true"
   availability_zone       = "${data.aws_availability_zones.available.names[0]}"
 
-  tags {
-          Name        = "dmz-subnet"
-          Environment = "${var.environment_tag}"
-          
+      tags {
+        Name = "${var.name}-dmz-sn"
+        Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"     
   }
 
 }
@@ -135,9 +169,11 @@ resource "aws_subnet" "pub_tfe_subnet" {
   map_public_ip_on_launch = "true"
   availability_zone       = "${data.aws_availability_zones.available.names[count.index % local.mod_az]}"
 
-  tags {
-          Name = "tfe-pub-subnet"
-          Environment = "${var.environment_tag}"
+      tags {
+        Name = "${var.name}-tfe-pub-sn"
+        Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"     
   }
 
 }
@@ -152,9 +188,12 @@ resource "aws_subnet" "tfe_subnet" {
   map_public_ip_on_launch = "false"
   availability_zone       = "${data.aws_availability_zones.available.names[count.index % local.mod_az]}"
 
-  tags {
-          Name = "tfe-prv-subnet"
-          Environment = "${var.environment_tag}"
+
+      tags {
+        Name = "${var.name}-tfe-sn"
+        Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"     
   }
 
 }
@@ -169,11 +208,12 @@ resource "aws_instance" "nat" {
   key_name                    = "${var.key_name}"
   source_dest_check           = false
 
-  tags {
-         Name        = "nat-instance"
-         Environment = "${var.environment_tag}"
-         TTL         = "${var.ttl}"
-         Owner       = "${var.owner}"
+
+      tags {
+        Name = "${var.name}-nat-sn"
+        Environment = "${var.environment_tag}"
+        TTL         = "${var.ttl}"
+        Owner       = "${var.owner}"     
   }
 
 }
