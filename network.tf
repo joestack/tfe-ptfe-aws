@@ -111,7 +111,6 @@ resource "aws_route_table_association" "pub_tfe-subnet" {
   subnet_id      = "${element(aws_subnet.pub_tfe_subnet.*.id, count.index)}"
   route_table_id = "${aws_route_table.rtb.id}"
     
-    }
 }
 
 # private subnet to NAT
